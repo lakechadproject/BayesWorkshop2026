@@ -22,32 +22,33 @@ In this exercise, you are given an example of data manipulation using the tidyve
 ### 1a) Learning by example
 
 ```{r ex1a}
-# Step 1:
+# Step 1:Loading required packages
 library(agridat)
 library(tidyverse)
 
-# Step 2:
+# Step 2:reading the data
 data(ilri.sheep)
 
-# Step 3:
+# Step 3:renaming the data as sheep
 sheep <- ilri.sheep
 
-# Step 4:
+# Step 4:extracting observations from the year 94 which does not have missing value for weanwt
 sheep94 <- sheep %>% filter(year == 94, !is.na(weanwt)) 
 
-# Step 5:
+# Step 5: adding a new column wtchange  to sheep94
 sheep94 <- sheep94 %>%
   mutate(wtchange = weanwt - birthwt)
 
-# Step 6:
+# Step 6:Calculating the mean birthweight , mean weanwt, and meanwtchange by genotype of sheep
 sheepSummary <- sheep94 %>% group_by(gen) %>% summarize(mean_birthwt = mean(birthwt),
       mean_weanwt = mean(weanwt), mean_wtchange = mean(wtchange), n= n())
 
-# Step 7:
+# Step 7:Print the first 6 rows of sheep94
 head(sheep94)
 
-# Step 8:
+# Step 8:remove the datasets from the environment
 rm(sheep, sheep94, ilri.sheep)
+
 ```
 
 
@@ -62,20 +63,38 @@ Use the sample code from 1a and the steps written in the code chunk below to com
 
 ```{r ex1b}
 # Step 1: Load required packages
+library("agridat")
+library("tidyverse")
 
 # Step 2: Load required data and view its documentation
+data("ilri.sheep")
+?ilri.sheep
 
 # Step 3: Copy the ilri.sheep data into a new object called sheep
+sheep <- ilri.sheep
 
 # Step 4: Filter data to only include male lambs with a recorded wean age
 
+sheep_male<- sheep |>  filter(sex=="M", !is.na(weanage))
+
 # Step 5: Group data by year and ewe genotype
+sheep_male<- sheep_male |> group_by(year,ewegen)
 
 # Step 6: Summarize data by calculating standard deviation and median for both wean age and dam age as well as maximum dam age
 
+sheep_male_summary<- sheep_male |> group_by(year,ewegen) |> summarize(std_weanage = sd(weanage),
+                                             med_weanage = median(weanage),
+                                             std_damage = sd(damage),
+                                             med_damage = median(damage),
+                                             max_damage = max(damage),
+                                             n=n(),
+                                             .groups ="keep"
+                                            )
 # Step 7: Inspect the summarized data
+head(sheep_male_summary)
 
 # Step 8: Clear one or more objects from your working environment
+rm(sheep,sheep_mnale)
 
 ```
 
@@ -91,21 +110,21 @@ In this exercise, you are given an example of plot creation using the tidyverse 
 
 
 ```{r ex2a, warning = FALSE}
-# Step 1: 
+# Step 1: load the required packages
 library(agridat)
 library(tidyverse)
 
-# Step 2: 
+# Step 2: reading the dataset
 data(ilri.sheep)
 sheep <- ilri.sheep
 
-# Step 3: 
+# Step 3:call ggplot with sheep
 ggplot(data = sheep) + 
-  # Step 4: 
+  # Step 4: making a scatter plot of weanwt vs weanage and coloring by genotype
   geom_point(aes(x = weanage, y=weanwt, color = gen)) + 
-  # Step 5:
+  # Step 5:dding x  and y label and titling our plot
   labs(x = "Lamb weaning age", y = "Lamb weaning weight", title = "Lamb weaning age and weight by genotype") +
-  # Step 6:
+  # Step 6: making the plots by year(like grouping by year)
   facet_wrap(~year)
 ```
 
@@ -123,19 +142,24 @@ Use the sample code from 2a and the steps written in the code chunk below to com
 
 ```{r ex2b, warning = FALSE}
 # Step 1: Load required packages
+library(agridat)
+library(tidyverse)
 
 
 # Step 2: Load required data and save
+sheep <- ilri.sheep
 
 
 # Step 3: Call ggplot with sheep data
+ggplot(data=sheep) +
 
   # Step 4: Create a scatter plot with birth weight for x axis, wean weight for y axis, shape for sex and alpha for wean age
-
+        geom_point(aes(x = birthwt , y= weanwt, shape = sex , alpha = weanage,color= sex)) +
   # Step 5: Include descriptive labels
-
+        labs(x="Lamb birth weight", y="weight of lamb at weaning", 
+             title = "Lamb weaning weight  and birth weight  by sex" ) + 
   # Step 6: Split plot by lamb genotype
-
+        facet_wrap(~gen)
 ```
 
 
