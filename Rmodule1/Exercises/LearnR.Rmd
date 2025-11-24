@@ -4,7 +4,7 @@ author: "Sarah Manski"
 date: "April 2023"
 output: html_document
 ---
-With updates by Katherine Muller, October 2025 - Quadri
+With updates by Katherine Muller, October 2025 - Quadripop
 
 ```{r setup, include=FALSE}
 # This is the setup chunk that includes some settings for your document
