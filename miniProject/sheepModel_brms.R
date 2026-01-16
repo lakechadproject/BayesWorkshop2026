@@ -13,6 +13,7 @@ library(emmeans)
 library(brms)
 library(posterior)
 library(bayesplot)
+library(HDInterval)
 
 # load and set up data ----------
 data("ilri.sheep")
@@ -191,3 +192,5 @@ psampnew <- posterior_predict(modelfit,ndraws = 1000,newdata = newd)
 
 ## predict data excluding the group-level effect of year
 psampnoyear <- posterior_predict(modelfit,ndraws = 1000,re_formula = ~0)
+
+

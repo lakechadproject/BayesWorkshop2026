@@ -1,0 +1,180 @@
+---
+title: "Mini Project"
+author: "Katherine Muller"
+date: "2026-01-06"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The purpose of this exercise is for you to implement the steps of a Bayesian data analysis using a relatively simple example. 
+
+1. Describe the study system.
+2. Inspect the data.
+3. Draw a causal diagram.
+4. Define one or more research questions.
+5. Define one or more specific variables that address a research question.
+6. Design and implement a statistical model.
+7. Obtain results.
+
+
+
+## Study system and data
+
+For this exercise we will be using the ilri.sheep dataset from the agridat package. 
+
+First, install the package if you haven't already.
+```{r, eval = FALSE}
+install.packages("agridat") # run this line
+
+```
+
+Next, load the package.
+```{r, eval=TRUE}
+library(agridat)
+library(tidyverse)
+library(ggforce)
+```
+
+### Read the documentation for the ilri.sheep dataset.
+
+```{r, eval = FALSE}
+?ilri.sheep
+
+```
+
+### Define one or more broad research questions or topics that could be addressed with this dataset.
+You will refine these questions after you draw a conceptual model.
+
+
+FILL IN:
+Examples:
+How does lamb genotype affect traits of interest?
+  How do Dorpor and Red Maasi lambs differ in traits of interest?
+  How does the parentage affect hybrid traits (i.e., Dorpor father and Red Maasi   mother and vice versa)?
+How does sex affect traits of interest?
+How does environment (year) affect traits of interest?
+How do the effects of sex interact with the effects of genotype?
+What is the heritability of traits of interest?
+
+
+
+### Draw a causal diagram
+
+Use your scientific reasoning to think though cause-and-effect relationships between variables in the ilri.sheep dataset. Denote variables as nodes and causal relationships as arrows.
+
+
+
+
+## Exploratory data visualization
+
+Before building any statistical models, visualize your data. Use your exploratory questions as a guide.   
+
+What do you want to see? Try sketching some plots on a piece of paper.
+
+At this point, we will work together as a group to code some plots. The 
+
+
+```{r}
+data(ilri.sheep) # load data
+sheep <- ilri.sheep
+
+# sheep %>%
+#   drop_na() %>%
+#   ggplot(aes(x = gen, y = birthwt, fill = sex)) + 
+#   geom_violin()+ 
+#   geom_point(position = position_jitterdodge()) 
+
+sheep %>%
+  drop_na() %>%
+  ggplot(aes(x = gen, y = birthwt, fill = sex)) +
+  geom_violin()+
+  ggforce::geom_sina(alpha= 0.5) 
+
+sheep %>%
+  drop_na() %>%
+  ggplot(aes(x = gen, y = weanwt, fill = sex)) +
+  geom_violin()+
+  ggforce::geom_sina(alpha= 0.5) 
+
+
+sheep %>%
+  drop_na() %>%
+  ggplot(aes(x = gen, y = weanage, fill = sex)) +
+  geom_violin()+
+  ggforce::geom_sina(alpha= 0.5) 
+
+sheep %>%
+  drop_na() %>%
+  ggplot(aes(x = gen, y = damage, fill = sex)) +
+  geom_violin()+
+  ggforce::geom_sina(alpha= 0.5) 
+
+
+```
+
+## Describe some patterns you can see from your exploratory visualization
+
+Develop a set of hypotheses and/or predictions that we can evaluate with a statistical model
+
+
+## Prepare the data
+
+Before you do any kind of analysis, you will need to make sure that the data are in a form you can work with. When importing a data table into R, R guesses what type of data is in each column based on its contents. The two main data types are character and numeric. Continuous variables should be numbers (type num, int, or dbl). If the column contains any non-numeric string, R will read it as a character. For example, if I write "missing" for missing values in a numeric column, R will interpret the whole column as characters.
+
+### Are the numbers numbers?
+
+Based on your knowledge of the dataset, identify the columns that should be **continuous**. Verify that R has read them as numeric (num, int, or dbl). 
+
+```{r}
+str(sheep) 
+```
+
+### Are the categories categories?
+
+For analysis, it can be helpful to convert categorical variables into factors. For example, in the sheep dataset, the variable sex is a factor with two levels, F and M. This means that R interprets this variable as an integer with F = 1 and M = 2. You can specify how to order the factor levels, but alphabetical is the default. In research studies, it is common to see categorical variables coded as integers.  
+
+Because R interprets factors as integers, you have to be careful with them if you have lots of data processing steps. Here we will use factors for categorical variables to help with analysis. 
+
+Based on your knowledge of the dataset, identify the columns that should be **categorical**. In the sheep data, several categorical variables have already  been converted to factors. 
+
+```{r}
+str(sheep) 
+```
+
+Note: because factor levels are sometimes lost in translation, I sometimes recommend using new columns instead of overwriting the old columns. Since I have a copy of the original data in ilri.sheep, I'm not bothering with that here.
+```{r}
+sheep <- sheep %>% mutate(year = factor(year),
+                          ram = factor(ram), # the ram and ewe id is relevant for some models
+                          ewe = factor(ewe)) 
+# if there were multiple measurements for individual lambs, I would recommend coding lamb as a factor as well. 
+
+```
+
+
+
+## Transform continuous data so they are easier to model. 
+
+
+A common strategy is to standardize continuous metrics by subtracting the mean and dividing by standard deviation.
+
+```{r}
+## the scale function standardizes data. it returns a matrix, so we have to subset it.
+sheep <- sheep %>% mutate(std_birthwt = scale(birthwt,center = TRUE, scale=TRUE)[,1],
+                          std_weanwt = scale(weanwt, center = TRUE, scale = TRUE)[,1],
+                          std_weanage = scale(weanage, center = TRUE, scale = TRUE)[,1],
+                          std_damage = scale(damage, center = TRUE, scale = TRUE)[,1])
+```
+
+
+
+## Design a model
+
+Look back to your causal diagram. Identify a 
+We're going to focus on wean weight as the primary response variable. 
+
+What are the predictor variables that could affect the variable of interest?
+
+
